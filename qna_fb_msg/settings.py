@@ -25,9 +25,7 @@ SECRET_KEY = 'w$igf7t=^9m(@1a(f!qj_aa_s@3!80f7eye4o02chj@(k76(03'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['792e9b30.ngrok.io']
-
-# vaibhav singh
+ALLOWED_HOSTS = ['58973560.ngrok.io',]
 
 
 # Application definition
@@ -77,9 +75,13 @@ WSGI_APPLICATION = 'qna_fb_msg.wsgi.application'
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+   'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'dj',
+        'USER': 'root',
+        'PASSWORD': 'redhat',
+        'HOST': 'localhost',   # Or an IP Address that your DB is hosted on
+        'PORT': '3306',
     }
 }
 
