@@ -6,5 +6,10 @@ from django.views import generic
 from django.http.response import HttpResponse
 # Create your views here.
 class QnABotView(generic.View):
+    # def get(self, request, *args, **kwargs):
+    #     return HttpResponse("Hello World!")
     def get(self, request, *args, **kwargs):
-        return HttpResponse("Hello World!")
+        if self.request.GET['hub.verify_token'] == '8588898891':
+            return HttpResponse(self.request.GET['hub.challenge'])
+        else:
+            return HttpResponse('Error, invalid token')
