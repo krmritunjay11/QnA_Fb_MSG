@@ -27,6 +27,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['792e9b30.ngrok.io']
 
+# vaibhav singh
+
 
 # Application definition
 
