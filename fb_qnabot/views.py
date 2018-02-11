@@ -57,18 +57,19 @@ class QnABotView(generic.View):
     # Post function to handle Facebook messages
     def post(self, request, *args, **kwargs):
         # event_entry=json.loads(self.request.body.decode('utf-8'))
-        # # print(event_entry)
-        # messaging_event = event_entry['entry'][0]['messaging'][0]
-        # # msg_txt   = messaging_event['message']['text']
-        # # sender_id = messaging_event['sender']['id']
-        # # pprint(msg_txt)
-        # # post_facebook_message(sender_id, msg_txt)
+        # if event_entry['entry'][0]['messaging'][0]:
+        #     messaging_event = event_entry['entry'][0]['messaging'][0]
+        #     msg_txt   = messaging_event['message']['text']
+        #     sender_id = messaging_event['sender']['id']
+        #     pprint(messaging_event)
+        #     post_facebook_message(sender_id, msg_txt)
         # return HttpResponse()
 
         # Converts the text payload into a python dictionary
         incoming_message = json.loads(self.request.body.decode('utf-8'))
         # Facebook recommends going through every entry since they might send
         # multiple messages in a single call during high load
+        pprint(incoming_message)
         for entry in incoming_message['entry']:
             for message in entry['messaging']:
                 # Check to make sure the received call is a message call
