@@ -8,6 +8,7 @@ from django.http.response import HttpResponse
 
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from fb_qnabot.models import Questions
 
 #  ------------------------ Fill this with your page access token! -------------------------------
 PAGE_ACCESS_TOKEN = "EAAC0mYf4lo4BAIMH6cRhfenIymo36CdY1TQ2hZB1htaTIFdoYiNQcPsGhwjvPjZBZBaQMWDoVH5d9BpUS7dX22yoZCOiIWb0vvIv9YjqMShMFSv8DsOLkoYOB7itaI8uIblmw1zF8KjrZBgmZA0bJqM1Jh8gHb3wQWmRtTLS0eCQZDZD"
@@ -76,10 +77,17 @@ class QnABotView(generic.View):
                 # This might be delivery, optin, postback for other events
                 if 'message' in message:
                     # Print the message to the terminal
-                    pprint(message)
+                    # pprint(message)
+                    msg_mid   = message['message']['mid']
+                    msg_txt   = message['message']['text']
+                    recipient_id = message['recipient']['id']
+                    sender_id = message['sender']['id']
+                    timestamp = message['timestamp']
                     # Assuming the sender only sends text. Non-text messages like stickers, audio, pictures
                     # are sent as attachments and must be handled accordingly.
                     post_facebook_message(message['sender']['id'], message['message']['text'])
+                    q = Questions(mid=msg_mid, question=msg_txt, recipient=recipient_id, sender=sender_id, timestamp=timestamp)
+                    q.save()
         return HttpResponse()
 
 # Create your views here.

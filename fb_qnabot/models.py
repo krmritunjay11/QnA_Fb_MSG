@@ -15,7 +15,7 @@ class Questions(models.Model):
         return self.question
 
 class Answers(models.Model):
-    qid = models.IntegerField(max_length=60)
+    qid = models.IntegerField()
     answer = models.CharField(max_length=60)
     timestamp = models.CharField(max_length=50)
 
