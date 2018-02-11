@@ -4,5 +4,5 @@ from django.contrib import admin
 from .views import QnABotView
 
 urlpatterns = [
-    url(r'^7cc599762b5f68f04acd104241513b333838150e5294fe0d82/?$', QnABotView.as_view(), name='fb_random') # Mritunjay
+    url(r'^3fe31f84b0ea9e1bdc93868d9167293671a4537c43e848db14/?$', QnABotView.as_view(), name='fb_random') # Mritunjay
 ]
