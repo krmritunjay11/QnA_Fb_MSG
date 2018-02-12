@@ -1,0 +1,23 @@
+<!-- templates/home.html -->
+{% extends 'header.html' %}
+
+{% block content %}
+<h2>Question List</h2>
+
+<table class="address-details" border = 1 cellspacing = 0 cellpadding = 3 width = 100%>
+     <thead>
+       <th>Question</th>
+       <th>Sender</th>
+       <th>Action</th>
+     </thead>
+     <tbody>
+      {% for question in object_list %}
+         <tr>
+           <td>  <a href="{% url 'question_detail' question.pk %}">{{ question.question }}</a> </td>
+           <td>  {{ question.sender }} </td>
+           <td>  <a href="{% url 'answer_new' question.pk %}?qid={{question.pk}}">Reply</a> </td>
+         </tr>
+       {% endfor %}
+     </tbody>
+   </table>
+{% endblock content %}

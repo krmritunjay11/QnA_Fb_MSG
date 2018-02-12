@@ -2,13 +2,19 @@
 # /fb_yomamabot/views.py
 import json, requests, random, re
 from pprint import pprint
-
 from django.views import generic
+from django.views.generic import TemplateView
+from django.views.generic import ListView, DetailView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.http.response import HttpResponse
-
+from datetime import datetime
+from django.urls import reverse_lazy
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from fb_qnabot.models import Questions
+from fb_qnabot.models import Answers
+from django.shortcuts import render
+import requests
 
 #  ------------------------ Fill this with your page access token! -------------------------------
 PAGE_ACCESS_TOKEN = "EAAC0mYf4lo4BAIMH6cRhfenIymo36CdY1TQ2hZB1htaTIFdoYiNQcPsGhwjvPjZBZBaQMWDoVH5d9BpUS7dX22yoZCOiIWb0vvIv9YjqMShMFSv8DsOLkoYOB7itaI8uIblmw1zF8KjrZBgmZA0bJqM1Jh8gHb3wQWmRtTLS0eCQZDZD"
@@ -37,6 +43,30 @@ def post_facebook_message(fbid, recevied_message):
     user_details_params = {'fields':'first_name,last_name,profile_pic', 'access_token':PAGE_ACCESS_TOKEN}
     user_details = requests.get(user_details_url, user_details_params).json()
     joke_text = 'Yo '+user_details['first_name']+'..! ' + joke_text
+
+    post_message_url = 'https://graph.facebook.com/v2.6/me/messages?access_token=%s'%PAGE_ACCESS_TOKEN
+    response_msg = json.dumps({"recipient":{"id":fbid}, "message":{"text":joke_text}})
+    status = requests.post(post_message_url, headers={"Content-Type": "application/json"},data=response_msg)
+    pprint(status.json())
+
+# Helper function
+def post_facebook_message_autoreply(fbid, recevied_message):
+    user_details_url = "https://graph.facebook.com/v2.6/%s"%fbid
+    user_details_params = {'fields':'first_name,last_name,profile_pic', 'access_token':PAGE_ACCESS_TOKEN}
+    user_details = requests.get(user_details_url, user_details_params).json()
+    joke_text = 'Hi '+user_details['first_name']+', thanks for posting question here, our team will reply soon...'
+
+    post_message_url = 'https://graph.facebook.com/v2.6/me/messages?access_token=%s'%PAGE_ACCESS_TOKEN
+    response_msg = json.dumps({"recipient":{"id":fbid}, "message":{"text":joke_text}})
+    status = requests.post(post_message_url, headers={"Content-Type": "application/json"},data=response_msg)
+    pprint(status.json())
+
+# Helper function
+def post_facebook_message_send(fbid, recevied_message):
+    user_details_url = "https://graph.facebook.com/v2.6/%s"%fbid
+    user_details_params = {'fields':'first_name,last_name,profile_pic', 'access_token':PAGE_ACCESS_TOKEN}
+    user_details = requests.get(user_details_url, user_details_params).json()
+    joke_text = recevied_message
 
     post_message_url = 'https://graph.facebook.com/v2.6/me/messages?access_token=%s'%PAGE_ACCESS_TOKEN
     response_msg = json.dumps({"recipient":{"id":fbid}, "message":{"text":joke_text}})
@@ -85,7 +115,7 @@ class QnABotView(generic.View):
                     timestamp = message['timestamp']
                     # Assuming the sender only sends text. Non-text messages like stickers, audio, pictures
                     # are sent as attachments and must be handled accordingly.
-                    post_facebook_message(message['sender']['id'], message['message']['text'])
+                    post_facebook_message_autoreply(message['sender']['id'], message['message']['text'])
                     q = Questions(mid=msg_mid, question=msg_txt, recipient=recipient_id, sender=sender_id, timestamp=timestamp)
                     q.save()
         return HttpResponse()
@@ -100,3 +130,36 @@ class QnABotView(generic.View):
 #     #         return HttpResponse(self.request.GET['hub.challenge'])
 #     #     else:
 #     #         return HttpResponse('Error, invalid token')
+
+class QuestionListView(ListView):
+    model = Questions
+    template_name = 'questions.html'
+
+class QuestionDetailView(DetailView):
+    model = Questions
+    template_name = 'question_detail.html'
+    context_object_name = 'question_detail'
+
+class AnswerCreateView(CreateView):
+    model = Answers
+    template_name = 'answer_new.html'
+    # fields = '__all__'
+    fields = ['qid', 'answer']
+    success_url = reverse_lazy('questions')
+
+    # def get_context_data(self, **kwargs):
+    #     print(kwargs)
+    #     return HttpResponse(kwargs)
+
+    def get_initial(self):
+        initials = super(AnswerCreateView, self).get_initial()
+        initials['qid'] = self.kwargs['qid']
+        return initials
+
+    def form_valid(self, form):
+        # form.instance.answer = self.kwargs['qid']
+        # form.instance.answer = Event.objects.get(pk=self.kwargs['qid'])
+        # form.instance.answer = 'll'
+        form.instance.timestamp = datetime.now()
+        post_facebook_message_send(1910134052362244, form.instance.answer)
+        return super(AnswerCreateView, self).form_valid(form)
