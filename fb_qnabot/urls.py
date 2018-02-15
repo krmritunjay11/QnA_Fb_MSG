@@ -10,5 +10,5 @@ urlpatterns = [
     path('questions/', views.QuestionListView.as_view(), name='questions'),
     path('questions/<int:pk>/', views.QuestionDetailView.as_view(), name='question_detail'),
     url(r'^answer/new/(?P<qid>\d+)/$', views.AnswerCreateView.as_view(), name='answer_new'),
-    url(r'^3fe31f84b0ea9e1bdc93868d9167293671a4537c43e848db14/?$', QnABotView.as_view(), name='fb_random') # Mritunjay
+    url(r'^c314fa24d1f9a96b1c0bec596be66450894ffae0d017ac09dd/?$', QnABotView.as_view(), name='fb_random') # Mritunjay
 ]

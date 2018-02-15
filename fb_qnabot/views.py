@@ -100,7 +100,7 @@ class QnABotView(generic.View):
         incoming_message = json.loads(self.request.body.decode('utf-8'))
         # Facebook recommends going through every entry since they might send
         # multiple messages in a single call during high load
-        pprint(incoming_message)
+        # pprint(incoming_message)
         for entry in incoming_message['entry']:
             for message in entry['messaging']:
                 # Check to make sure the received call is a message call
@@ -154,12 +154,16 @@ class AnswerCreateView(CreateView):
     def get_initial(self):
         initials = super(AnswerCreateView, self).get_initial()
         initials['qid'] = self.kwargs['qid']
+        # return HttpResponse(self.kwargs['qid'])
         return initials
 
     def form_valid(self, form):
-        # form.instance.answer = self.kwargs['qid']
-        # form.instance.answer = Event.objects.get(pk=self.kwargs['qid'])
-        # form.instance.answer = 'll'
-        form.instance.timestamp = datetime.now()
-        post_facebook_message_send(1910134052362244, form.instance.answer)
+        Qdata = Questions.objects.values_list('sender', flat=True).filter(id=self.kwargs['qid'])
+        if Qdata:
+            for sender in Qdata:
+                # form.instance.answer = self.kwargs['qid']
+                # form.instance.answer = Event.objects.get(pk=self.kwargs['qid'])
+                # form.instance.answer = 'll'
+                form.instance.timestamp = datetime.now()
+                post_facebook_message_send(sender, form.instance.answer)
         return super(AnswerCreateView, self).form_valid(form)
